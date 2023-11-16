@@ -1,9 +1,10 @@
 go 1.20
 
 use (
-    ./account
-    ./api
-    ./auth
-    ./billing
-    ./sending
+	./account
+	./api
+	./auth
+	./billing
+	./queue
+	./sending
 )
