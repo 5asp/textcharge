@@ -1,9 +1,60 @@
 package main
 
-import "github.com/go-rel/rel"
+import (
+	"fmt"
+	"net/http"
+	"os"
+	"path/filepath"
+
+	"github.com/aheadIV/textcharge/account/publishing"
+	kitlog "github.com/go-kit/log"
+
+	"github.com/go-rel/postgres"
+	"github.com/julienschmidt/httprouter"
+
+	"github.com/go-rel/rel"
+	"github.com/spf13/viper"
+)
 
 func main() {
-	dsn := ""
+	configPath := filepath.Clean("./app.yaml")
 
+	var config *viper.Viper
+	{
+		config = viper.New()
+		config.SetConfigFile(configPath)
+
+		if err := config.ReadInConfig(); err != nil {
+			panic(fmt.Errorf("fatal error config file: %s", err))
+		}
+	}
 	var repo rel.Repository
+	{
+		adapter, _ := postgres.Open(config.GetString("db.testdb"))
+
+		// initialize rel's repo.
+		repo = rel.New(adapter)
+	}
+	var router *httprouter.Router
+	{
+		router = httprouter.New()
+	}
+
+	var logger kitlog.Logger
+	{
+		logger = kitlog.NewJSONLogger(os.Stderr)
+		logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC)
+		logger = kitlog.With(logger, "caller", kitlog.DefaultCaller)
+	}
+	publishing.RegisterRPCService(logger, repo, config)
+
+	var service publishing.Service
+	{
+		service = publishing.New(logger, config)
+	}
+
+	publishing.MakeHttpHandler(router, service)
+
+	logger.Log("msg", "HTTP", "addr", config.GetString("account.address"))
+	logger.Log("err", http.ListenAndServe(config.GetString("account.address"), router))
 }

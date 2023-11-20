@@ -1,0 +1,7 @@
+account:
+  address: ":8000"
+  rpc: ":1234"
+  rpcURL: "localhost:1234"
+
+db:
+  testdb: "postgres://manager:securepasswd@localhost/testdb?sslmode=disable"

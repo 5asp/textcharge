@@ -24,18 +24,18 @@ type loginRequest struct {
 }
 
 type loginResponse struct {
-	V   string `json:"v"`
-	Err string `json:"err,omitempty"`
+	Token string `json:"token,omitempty"`
+	Err   string `json:"err,omitempty"`
 }
 
 func makeLoginEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(loginRequest)
-		v, err := s.Login(&req)
+		v, err := s.Login(ctx, &req)
 		if err != nil {
-			return loginResponse{V: v.V, Err: err.Error()}, nil
+			return v, nil
 		}
-		return loginResponse{V: v.V, Err: ""}, nil
+		return v, nil
 	}
 }
 
@@ -45,14 +45,14 @@ type registerRequest struct {
 }
 
 type registerResponse struct {
-	V   string `json:"v"`
-	Err string `json:"err,omitempty"`
+	Code int    `json:"code"`
+	Err  string `json:"err,omitempty"`
 }
 
 func makeRegisterEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(registerRequest)
-		v, err := s.Register(&req)
+		v, err := s.Register(ctx, &req)
 		if err != nil {
 			return nil, err
 		}

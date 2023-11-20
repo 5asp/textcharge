@@ -1,0 +1,5 @@
+auth:
+  address: ":8001"
+  salt: "gui5shi1da@"
+account:
+  rpcURL: "localhost:1234"

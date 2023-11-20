@@ -19,5 +19,21 @@
    - 记录更新：更新数据库中的交易和用户账户信息。
    - 响应返回：向用户发送操作结果。
 
+## 接口:
+
+   - account/login
+   - account/register
+   
+   - app/create
+   - app/list
+   - app/delete
+   - app/info
+   - app/edit
+
+   - billing/log
+   
+   - sms/send
+
+
 ## Flow
 ![TextCharge](./tech.jpg "TextCharge")

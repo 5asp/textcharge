@@ -1,13 +1,12 @@
-package user
+package app
 
 import "time"
 
-type User struct {
+type App struct {
 	ID        int
-	Account   string
-	Password  string
+	AppID     int
+	Secret    string
 	Status    int
-	UserApp   []UserApp
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
