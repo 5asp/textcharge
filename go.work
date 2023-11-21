@@ -7,4 +7,5 @@ use (
 	./billing
 	./queue
 	./sending
+	./websocket
 )
