@@ -1,55 +1,33 @@
 package main
 
 import (
-	"log"
+	"fmt"
+	"os"
+	"path/filepath"
 
-	"github.com/nats-io/nats.go"
+	kitlog "github.com/go-kit/log"
+
+	"github.com/aheadIV/textcharge/queue/publishing"
+	"github.com/spf13/viper"
 )
 
-func JetStreamInit() (nats.JetStreamContext, error) {
-	// Connect to NATS
-	nc, err := nats.Connect(nats.DefaultURL)
-	if err != nil {
-		return nil, err
-	}
+func main() {
+	configPath := filepath.Clean("./app.yaml")
 
-	// Create JetStream Context
-	js, err := nc.JetStream(nats.PublishAsyncMaxPending(256))
-	if err != nil {
-		return nil, err
-	}
+	var config *viper.Viper
+	{
+		config = viper.New()
+		config.SetConfigFile(configPath)
 
-	return js, nil
-}
-
-const (
-	StreamName     = "REVIEWS"
-	StreamSubjects = "REVIEWS.*"
-)
-
-func CreateStream(jetStream nats.JetStreamContext) error {
-	stream, err := jetStream.StreamInfo(StreamName)
-
-	// stream not found, create it
-	if stream == nil {
-		log.Printf("Creating stream: %s\n", StreamName)
-
-		_, err = jetStream.AddStream(&nats.StreamConfig{
-			Name:     StreamName,
-			Subjects: []string{StreamSubjects},
-		})
-		if err != nil {
-			return err
+		if err := config.ReadInConfig(); err != nil {
+			panic(fmt.Errorf("fatal error config file: %s", err))
 		}
 	}
-	return nil
-}
-
-type Review struct {
-	Id      string `json:"_id"`
-	Author  string `json:"author"`
-	Store   string `json:"store"`
-	Text    string `json:"text"`
-	Rating  int    `json:"rating"`
-	Created string `json:"created"`
+	var logger kitlog.Logger
+	{
+		logger = kitlog.NewJSONLogger(os.Stderr)
+		logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC)
+		logger = kitlog.With(logger, "caller", kitlog.DefaultCaller)
+	}
+	publishing.RegisterRPCService(logger, config)
 }

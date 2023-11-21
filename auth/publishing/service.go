@@ -49,7 +49,7 @@ func (s *service) Login(ctx context.Context, req *loginRequest) (res loginRespon
 	if req.Password == "" {
 		return res, errors.New("password != nil")
 	}
-	if !security.CheckPassword(account.Password, s.config.GetString("salt")+req.Password+s.config.GetString("salt")) {
+	if !security.CheckPassword(account.Password, s.config.GetString("auth.salt")+req.Password+s.config.GetString("auth.salt")) {
 		return res, errors.New("password not match.")
 	}
 
@@ -107,5 +107,5 @@ func CheckAccountExist(s *service, account string) (result *user.User) {
 			return
 		}
 	}
-	return result
+	return
 }

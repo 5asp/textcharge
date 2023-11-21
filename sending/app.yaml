@@ -1,0 +1,5 @@
+send:
+  address: ":8002"
+  salt: "gui5shi1da@"
+queue:
+  rpcURL: "localhost:1234"

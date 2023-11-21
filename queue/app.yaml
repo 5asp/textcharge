@@ -1,0 +1,7 @@
+queue:
+  rpc: ":1234"
+gateway:
+  url: "smpp.mysubmail.com"
+  port: "9000"
+  appid:
+  smppKey: ""
