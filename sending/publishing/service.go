@@ -1,11 +1,17 @@
 package publishing
 
 import (
+	"errors"
 	"net/rpc"
 
 	kitlog "github.com/go-kit/log"
 
 	"github.com/spf13/viper"
+)
+
+var (
+	ErrInvalidUser  = errors.New("invalid user")
+	ErrInvalidToken = errors.New("invalid token")
 )
 
 type Service interface {

@@ -1,5 +1,6 @@
 queue:
   rpc: ":1234"
+  timeout: 10
 gateway:
   url: "smpp.mysubmail.com"
   port: "9000"

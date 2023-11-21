@@ -13,6 +13,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	ErrInvalidUser  = errors.New("invalid user")
+	ErrInvalidToken = errors.New("invalid token")
+)
+
 type Service interface {
 	Login(ctx context.Context, req *loginRequest) (res loginResponse, err error)
 	Register(ctx context.Context, req *registerRequest) (res registerResponse, err error)

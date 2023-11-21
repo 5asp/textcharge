@@ -30,4 +30,5 @@ func main() {
 		logger = kitlog.With(logger, "caller", kitlog.DefaultCaller)
 	}
 	publishing.RegisterRPCService(logger, config)
+
 }

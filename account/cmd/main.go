@@ -8,9 +8,9 @@ import (
 
 	"github.com/aheadIV/textcharge/account/publishing"
 	kitlog "github.com/go-kit/log"
+	"github.com/gorilla/handlers"
 
 	"github.com/go-rel/postgres"
-	"github.com/julienschmidt/httprouter"
 
 	"github.com/go-rel/rel"
 	"github.com/spf13/viper"
@@ -35,10 +35,6 @@ func main() {
 		// initialize rel's repo.
 		repo = rel.New(adapter)
 	}
-	var router *httprouter.Router
-	{
-		router = httprouter.New()
-	}
 
 	var logger kitlog.Logger
 	{
@@ -53,8 +49,11 @@ func main() {
 		service = publishing.New(logger, config)
 	}
 
-	publishing.MakeHttpHandler(router, service)
+	r := publishing.MakeHttpHandler(logger, service)
+	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
 
-	logger.Log("msg", "HTTP", "addr", config.GetString("account.address"))
-	logger.Log("err", http.ListenAndServe(config.GetString("account.address"), router))
+	addr := config.GetString("account.address")
+
+	logger.Log("msg", "HTTP", "addr", addr)
+	logger.Log("err", http.ListenAndServe(addr, handlers.CompressHandler(loggedRouter)))
 }

@@ -6,22 +6,61 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-kit/kit/transport"
 	kithttp "github.com/go-kit/kit/transport/http"
-	"github.com/julienschmidt/httprouter"
+	kitlog "github.com/go-kit/log"
+	"github.com/gorilla/mux"
 )
 
-type Router interface {
-	Handle(method, path string, handler http.Handler)
+func newServerFinalizer(logger kitlog.Logger) kithttp.ServerFinalizerFunc {
+	return func(ctx context.Context, code int, r *http.Request) {
+		logger.Log("status", code, "path", r.RequestURI, "method", r.Method)
+	}
 }
 
-func MakeHttpHandler(router *httprouter.Router, s Service) {
+func encodeErrorResponse(_ context.Context, err error, w http.ResponseWriter) {
+	if err == nil {
+		panic("encodeError with nil error")
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(codeFrom(err))
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"error": err.Error(),
+	})
+}
+
+func codeFrom(err error) int {
+	switch err {
+	case ErrInvalidUser:
+		return http.StatusNotFound
+	case ErrInvalidToken:
+		return http.StatusUnauthorized
+	default:
+		return http.StatusInternalServerError
+	}
+}
+
+func MakeHttpHandler(log kitlog.Logger, s Service) *mux.Router {
+	options := []kithttp.ServerOption{
+		kithttp.ServerErrorHandler(transport.NewLogErrorHandler(log)),
+		kithttp.ServerErrorEncoder(encodeErrorResponse),
+		kithttp.ServerFinalizer(newServerFinalizer(log)),
+	}
+
 	sendHandler := kithttp.NewServer(
 		makeSendEndpoint(s),
 		decodeSendRequest,
-		encodeSendResponse,
+		encodeResponse,
+		options...,
 	)
 
-	router.Handler(http.MethodPost, "/send", sendHandler)
+	r := mux.NewRouter()
+	r.Methods("POST").Path("/send").Handler(sendHandler)
+	return r
+}
+
+func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
 }
 
 func decodeSendRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
@@ -30,14 +69,4 @@ func decodeSendRequest(ctx context.Context, r *http.Request) (request interface{
 		return nil, fmt.Errorf("Login err: %s", err)
 	}
 	return req, nil
-}
-
-func encodeSendResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
-	res, ok := response.(sendResponse)
-	if !ok {
-		return fmt.Errorf("Login failed: %s", "1")
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(res)
 }

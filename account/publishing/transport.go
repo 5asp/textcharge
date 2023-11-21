@@ -6,47 +6,76 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-kit/kit/transport"
 	kithttp "github.com/go-kit/kit/transport/http"
-	"github.com/julienschmidt/httprouter"
+	kitlog "github.com/go-kit/log"
+	"github.com/gorilla/mux"
 )
 
-type Router interface {
-	Handle(method, path string, handler http.Handler)
+func newServerFinalizer(logger kitlog.Logger) kithttp.ServerFinalizerFunc {
+	return func(ctx context.Context, code int, r *http.Request) {
+		logger.Log("status", code, "path", r.RequestURI, "method", r.Method)
+	}
 }
 
-func MakeHttpHandler(router *httprouter.Router, s Service) {
+func encodeErrorResponse(_ context.Context, err error, w http.ResponseWriter) {
+	if err == nil {
+		panic("encodeError with nil error")
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(codeFrom(err))
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"error": err.Error(),
+	})
+}
+
+func codeFrom(err error) int {
+	switch err {
+	case ErrInvalidUser:
+		return http.StatusNotFound
+	case ErrInvalidToken:
+		return http.StatusUnauthorized
+	default:
+		return http.StatusInternalServerError
+	}
+}
+
+func MakeHttpHandler(log kitlog.Logger, s Service) *mux.Router {
+	options := []kithttp.ServerOption{
+		kithttp.ServerErrorHandler(transport.NewLogErrorHandler(log)),
+		kithttp.ServerErrorEncoder(encodeErrorResponse),
+		kithttp.ServerFinalizer(newServerFinalizer(log)),
+	}
 	loginHandler := kithttp.NewServer(
 		makeLoginEndpoint(s),
 		decodeLoginRequest,
-		encodeLoginResponse,
+		encodeResponse,
+		options...,
 	)
 
 	registerHandler := kithttp.NewServer(
 		makeRegisterEndpoint(s),
 		decodeRegisterRequest,
-		encodeRegisterResponse,
+		encodeResponse,
+		options...,
 	)
 
-	router.Handler(http.MethodPost, "/login", loginHandler)
-	router.Handler(http.MethodPost, "/register", registerHandler)
+	r := mux.NewRouter()
+	r.Methods("POST").Path("/login").Handler(loginHandler)
+	r.Methods("POST").Path("/register").Handler(registerHandler)
+	return r
+}
+
+func encodeResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
 }
 
 func decodeLoginRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
 	var req loginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, fmt.Errorf("Login err: %s", err)
+		return nil, fmt.Errorf("decodeLoginRequest: %s", err)
 	}
 	return req, nil
-}
-
-func encodeLoginResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
-	res, ok := response.(loginResponse)
-	if !ok {
-		return fmt.Errorf("Login failed: %s", "1")
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(res)
 }
 
 func decodeRegisterRequest(ctx context.Context, r *http.Request) (request interface{}, err error) {
@@ -55,13 +84,4 @@ func decodeRegisterRequest(ctx context.Context, r *http.Request) (request interf
 		return nil, fmt.Errorf("decodeRegisterRequest %s", err)
 	}
 	return req, nil
-}
-
-func encodeRegisterResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
-	res, ok := response.(registerResponse)
-	if !ok {
-		return fmt.Errorf("encodeRegisterResponse failed cast response")
-	}
-	w.Header().Set("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(res)
 }

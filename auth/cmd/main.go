@@ -8,7 +8,7 @@ import (
 
 	"github.com/aheadIV/textcharge/auth/publishing"
 	kitlog "github.com/go-kit/log"
-	"github.com/julienschmidt/httprouter"
+	"github.com/gorilla/handlers"
 
 	"github.com/spf13/viper"
 )
@@ -31,18 +31,17 @@ func main() {
 		logger = kitlog.With(logger, "ts", kitlog.DefaultTimestampUTC)
 		logger = kitlog.With(logger, "caller", kitlog.DefaultCaller)
 	}
-	var router *httprouter.Router
-	{
-		router = httprouter.New()
-	}
 
 	var service publishing.Service
 	{
 		service = publishing.New(logger, config)
 	}
 
-	publishing.MakeHttpHandler(router, service)
+	r := publishing.MakeHttpHandler(logger, service)
+	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
 
-	logger.Log("msg", "HTTP", "addr", config.GetString("auth.address"))
-	logger.Log("err", http.ListenAndServe(config.GetString("auth.address"), router))
+	addr := config.GetString("auth.address")
+
+	logger.Log("msg", "HTTP", "addr", addr)
+	logger.Log("err", http.ListenAndServe(addr, handlers.CompressHandler(loggedRouter)))
 }
