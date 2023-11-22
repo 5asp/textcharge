@@ -28,8 +28,9 @@ func myws(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	c := &connection{
-		sc: make(chan []byte, 256),
-		ws: ws, data: &Data{},
+		sc:   make(chan []byte, 256),
+		ws:   ws,
+		data: &Data{},
 	}
 	h.r <- c
 	go c.writer()

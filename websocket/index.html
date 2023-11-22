@@ -3,81 +3,70 @@
 <head>
     <meta charset="utf-8" />
     <title>WebSocket Test</title>
-    <script type="text/javascript">
-        var wsUri = "ws://localhost:9001/ws";
-        var output;
-        var socket;
-
-        function init() {
-            output = document.getElementById("output");
-
-            if (window.WebSocket) {
-                // WebSocket supported
-                writeToScreen("WebSocket supported");
-                testWebSocket();
-
-            } else {
-                // WebSocket not supported  
-                writeToScreen("WebSocket not supported");
-            }
-        }
-
-        function testWebSocket() {
-            socket = new WebSocket(wsUri);
-            socket.onopen = function (evt) { onOpen(evt) };
-            socket.onclose = function (evt) { onClose(evt) };
-            socket.onmessage = function (evt) { onMessage(evt) };
-            socket.onerror = function (evt) { onError(evt) };
-        }
-
-        function onOpen(evt) {
-            writeToScreen("CONNECTED");
-            doSend("WebSocket is on the air");
-        }
-
-        function onClose(evt) {
-            writeToScreen("DISCONNECTED");
-        }
-
-        function onMessage(evt) {
-            writeToScreen('<span style="color: blue;">RESPONSE: ' +                 evt.data.toString() + '</span>');
-            socket.close();
-        }
-
-        function onError(evt) {
-            writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-        }
-
-        function doSend(message) {
-            if (socket.readyState != WebSocket.OPEN)
-                return;
-
-            socket.send(message);
-            writeToScreen("SENT: " + message);
-
-        }
-
-        function writeToScreen(message) {
-            var pre = document.createElement("p");
-            pre.style.wordWrap = "break-word";
-            pre.innerHTML = message;
-            output.appendChild(pre);
-        }
-
-
-        // should probably use jQuery.ready here
-        if (window.addEventListener) {
-            // for W3C DOM
-            window.addEventListener("load", init, false);
-        } else {
-            // legacy IE
-            window.attachEvent("onload", init);
-        }
-
-    </script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script> 
+        $(document).ready(function(){
+            
+        });
+        </script>
+<style type="text/css">
+        table {
+        /*为表格设置合并边框模型*/
+        border-collapse: collapse;
+        /*列宽由表格宽度和列宽度设定*/
+        table-layout: fixed;
+        width: 60%;
+        margin:auto;
+        white-space: nowrap;
+    }
+    
+    td {
+        border: 1px solid #ddd;
+        /*允许在单词内换行。*/
+        word-break: break-word;
+        /*设置宽度*/
+        width: 100px;
+        height: 30px;
+        overflow-y: auto;
+    }
+</style>
 </head>
 <body>
-    <h2>WebSocket Test</h2>
-    <div id="output"></div>
+    <div id="output">
+        <table border="1">
+            <tr>
+              <th>SendID</th>
+              <th>AppID</th>  
+              <th>PhoneNumber</th>
+              <th>SMS</th>
+              <th>CreatedAt</th>
+              <th>Action</th>
+            </tr>
+            <tr id="items">
+              <td>Harry Depp</td>
+              <td>28</td>
+              <td>Britain</td>
+              <td>BritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritain</td>
+              <td>Britain</td>
+              <td>Britain</td>
+            </tr>
+            <tr>
+                <td>Harry Depp</td>
+                <td>28</td>
+                <td>Britain</td>
+                <td>BritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritain</td>
+                <td>Britain</td>
+                <td>Britain</td>
+              </tr>
+              <tr>
+                <td>Harry Depp</td>
+                <td>28</td>
+                <td>Britain</td>
+                <td>BritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainBritainssssssssssssssBritainBritainBritainBritainBritainBritainBritainBritain</td>
+                <td>Britain</td>
+                <td>Britain</td>
+              </tr>
+          </table>
+    </div>
 </body>
 </html>

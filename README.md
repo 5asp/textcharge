@@ -34,6 +34,14 @@
    
    - sms/send
 
+   - api/user
+   - login
+   - register
+   - logout
+   - reset-password
+   - email/verification-notification
+   - sanctum/csrf-cookie
+
 
 ## Flow
 ![TextCharge](./tech.jpg "TextCharge")

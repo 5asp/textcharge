@@ -6,58 +6,22 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-kit/kit/transport"
 	kithttp "github.com/go-kit/kit/transport/http"
 	kitlog "github.com/go-kit/log"
 	"github.com/gorilla/mux"
 )
 
-func newServerFinalizer(logger kitlog.Logger) kithttp.ServerFinalizerFunc {
-	return func(ctx context.Context, code int, r *http.Request) {
-		logger.Log("status", code, "path", r.RequestURI, "method", r.Method)
-	}
-}
-
-func encodeErrorResponse(_ context.Context, err error, w http.ResponseWriter) {
-	if err == nil {
-		panic("encodeError with nil error")
-	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(codeFrom(err))
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"error": err.Error(),
-	})
-}
-
-func codeFrom(err error) int {
-	switch err {
-	case ErrInvalidUser:
-		return http.StatusNotFound
-	case ErrInvalidToken:
-		return http.StatusUnauthorized
-	default:
-		return http.StatusInternalServerError
-	}
-}
-
 func MakeHttpHandler(log kitlog.Logger, s Service) *mux.Router {
-	options := []kithttp.ServerOption{
-		kithttp.ServerErrorHandler(transport.NewLogErrorHandler(log)),
-		kithttp.ServerErrorEncoder(encodeErrorResponse),
-		kithttp.ServerFinalizer(newServerFinalizer(log)),
-	}
 	loginHandler := kithttp.NewServer(
 		makeLoginEndpoint(s),
 		decodeLoginRequest,
 		encodeResponse,
-		options...,
 	)
 
 	registerHandler := kithttp.NewServer(
 		makeRegisterEndpoint(s),
 		decodeRegisterRequest,
 		encodeResponse,
-		options...,
 	)
 
 	r := mux.NewRouter()
