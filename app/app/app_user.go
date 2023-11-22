@@ -2,11 +2,11 @@ package app
 
 import "time"
 
-type App struct {
+type AppUser struct {
 	ID        int
-	AppID     int `db:"appid"`
-	Secret    string
-	Status    int
+	AppID     int
+	UserID    int
+	ServiceID int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

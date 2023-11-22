@@ -1,7 +1,8 @@
+app:
+  address: ":8003"
+  rpc: ":1235"
+  rpcURL: "localhost:1235"
 account:
-  address: ":8000"
-  rpc: ":1234"
   rpcURL: "localhost:1234"
-
 db:
   testdb: "postgresql://aheadIV:oXnwUedJ47RI@ep-summer-tree-57217189-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"

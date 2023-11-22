@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS public.services
     id integer NOT NULL DEFAULT nextval('service_id_seq'::regclass),
     service_name text COLLATE pg_catalog."default",
     status integer NOT NULL DEFAULT 0,
-    created_at date,
-    updated_at date,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone,
     CONSTRAINT services_pkey PRIMARY KEY (id)
 )
 

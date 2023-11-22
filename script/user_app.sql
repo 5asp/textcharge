@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS public.user_app
     app_id integer NOT NULL,
     user_id integer NOT NULL,
     quota integer NOT NULL DEFAULT 0,
-    created_at date,
-    updated_at date,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone,
     service_id integer,
     CONSTRAINT user_app_pkey PRIMARY KEY (id)
 )

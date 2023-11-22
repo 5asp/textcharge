@@ -2,15 +2,14 @@ package publishing
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"net/rpc"
 
-	"github.com/aheadIV/textcharge/account/user"
+	"github.com/aheadIV/textcharge/app/app"
 	kitlog "github.com/go-kit/log"
 	"github.com/go-rel/rel"
-	"github.com/go-rel/rel/where"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 )
@@ -26,7 +25,21 @@ type RpcService struct {
 	Log  kitlog.Logger
 }
 
-func (s *RpcService) Insert(args *user.User, reply *int) error {
+func (s *RpcService) Insert(args *app.App, reply *int) error {
+	err := s.Repo.Insert(s.ctx, args)
+	if err != nil {
+		return err
+	}
+	var appData app.App
+	err = s.Repo.Find(s.ctx, &appData, rel.Eq("id", args.ID))
+	if err != nil {
+		*reply = 0
+		return err
+	}
+	*reply = appData.AppID
+	return nil
+}
+func (s *RpcService) InsertAppUser(args *app.AppUser, reply *int) error {
 	err := s.Repo.Insert(s.ctx, args)
 	if err != nil {
 		return err
@@ -35,7 +48,7 @@ func (s *RpcService) Insert(args *user.User, reply *int) error {
 	return nil
 }
 
-func (s *RpcService) Update(args *user.User, reply *int) error {
+func (s *RpcService) Update(args *app.App, reply *int) error {
 	if args.ID != 0 {
 		err := s.Repo.Update(s.ctx, args)
 		if err != nil {
@@ -47,10 +60,10 @@ func (s *RpcService) Update(args *user.User, reply *int) error {
 	return nil
 }
 
-func (s *RpcService) Delete(userID *int, reply *int) error {
-	if userID != nil {
-		err := s.Repo.Delete(s.ctx, &user.User{
-			ID: *userID,
+func (s *RpcService) Delete(ID *int, reply *int) error {
+	if ID != nil {
+		err := s.Repo.Delete(s.ctx, &app.App{
+			ID: *ID,
 		})
 		if err != nil {
 			*reply = Fail
@@ -61,23 +74,14 @@ func (s *RpcService) Delete(userID *int, reply *int) error {
 	return nil
 }
 
-func (s *RpcService) FindByID(userID *int, reply *user.User) error {
-	if userID != nil {
-		err := s.Repo.Find(s.ctx, reply, rel.Eq("id", userID))
-		if errors.Is(err, rel.ErrNotFound) {
-			return nil
-		}
-		return err
-	}
-	return nil
-}
+func (s *RpcService) FindByID(ID *int, reply *app.App) error {
+	if ID != nil {
+		id := *ID
+		fmt.Println(id)
 
-func (s *RpcService) FindByAccount(account string, reply *user.User) error {
-	if account != "" {
-		if err := s.Repo.Find(s.ctx, reply, where.Eq("account", account)); err != nil {
-			if errors.Is(err, rel.ErrNotFound) {
-				return nil
-			}
+		err := s.Repo.Find(s.ctx, reply, rel.Eq("id", id))
+		if err != nil {
+			*reply = app.App{}
 			return err
 		}
 	}
@@ -93,7 +97,7 @@ func RegisterRPCService(log kitlog.Logger, repo rel.Repository, config *viper.Vi
 	rpc.Register(rpcService)
 	rpc.HandleHTTP()
 
-	l, e := net.Listen("tcp", config.GetString("account.rpc"))
+	l, e := net.Listen("tcp", config.GetString("app.rpc"))
 	if e != nil {
 		log.Log("listen error:", e)
 	}

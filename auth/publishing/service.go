@@ -79,7 +79,8 @@ func (s *service) Register(ctx context.Context, req *registerRequest) (res regis
 
 	account := CheckAccountExist(s, req.Account)
 
-	if account != nil {
+	fmt.Println(account)
+	if account.ID > 0 {
 		res.Err = "account exits."
 		return res, errors.New("account exits.")
 	}
@@ -94,7 +95,7 @@ func (s *service) Register(ctx context.Context, req *registerRequest) (res regis
 	}
 	var status int
 	err = s.client.Call("RpcService.Insert", register, &status)
-
+	fmt.Println("status:", status)
 	if err != nil && status == Fail {
 		s.log.Log(err)
 		return res, nil
@@ -104,11 +105,11 @@ func (s *service) Register(ctx context.Context, req *registerRequest) (res regis
 }
 
 func CheckAccountExist(s *service, account string) (result *user.User) {
+	result = &user.User{}
 	if account != "" {
 		err := s.client.Call("RpcService.FindByAccount", account, result)
 		if err != nil {
-			fmt.Println("1111111111111111111111111111111")
-			// s.log.Log(err)
+			s.log.Log(err)
 			return
 		}
 	}

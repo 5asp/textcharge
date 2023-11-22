@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS public.apps
     appid integer,
     secret text COLLATE pg_catalog."default",
     status integer,
-    created_at date,
-    updated_at date,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone,
     CONSTRAINT apps_pkey PRIMARY KEY (id)
 )
 
