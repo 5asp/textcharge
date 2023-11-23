@@ -1,12 +1,14 @@
 go 1.20
 
 use (
-	./account
-	./api
-	./auth
-	./billing
-	./queue
-	./sending
-	./websocket
-	./app
+	./api-gateway
+	./application-management-service
+	./authentication-service
+	./dispatch-queue-service
+	./inspection-service
+	./messaging-queue-service
+	./service-management-service
+	./sms-service
+	./user-service
+	./validation-service
 )
