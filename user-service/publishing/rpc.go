@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/rpc"
 
-	"github.com/aheadIV/textcharge/account/user"
+	"github.com/aheadIV/textcharge/user-service/user"
 	kitlog "github.com/go-kit/log"
 	"github.com/go-rel/rel"
 	"github.com/go-rel/rel/where"

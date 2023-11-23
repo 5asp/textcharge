@@ -3,7 +3,6 @@ module github.com/aheadIV/textcharge/user-service
 go 1.20
 
 require (
-	github.com/aheadIV/textcharge/account v0.0.0-20231123110715-365056904a80
 	github.com/go-kit/log v0.2.1
 	github.com/go-rel/postgres v0.11.0
 	github.com/go-rel/rel v0.41.0

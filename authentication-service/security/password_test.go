@@ -3,7 +3,7 @@ package security_test
 import (
 	"testing"
 
-	"github.com/aheadIV/textcharge/user-service/security"
+	"github.com/aheadIV/textcharge/authentication-service/security"
 )
 
 func TestCreatePassword(t *testing.T) {
