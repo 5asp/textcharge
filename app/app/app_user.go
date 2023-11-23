@@ -10,3 +10,7 @@ type AppUser struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+func (b AppUser) Table() string {
+	return "user_apps"
+}

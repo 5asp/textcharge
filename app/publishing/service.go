@@ -80,8 +80,6 @@ func (s *service) CreateApp(req *createAppRequest) (res *createAppResponse, err 
 		err = errors.New("call create app err")
 		return nil, err
 	}
-	fmt.Println(appID)
-
 	appUserData := &app.AppUser{
 		AppID:  appID,
 		UserID: accountData.ID,

@@ -30,13 +30,7 @@ func (s *RpcService) Insert(args *app.App, reply *int) error {
 	if err != nil {
 		return err
 	}
-	var appData app.App
-	err = s.Repo.Find(s.ctx, &appData, rel.Eq("id", args.ID))
-	if err != nil {
-		*reply = 0
-		return err
-	}
-	*reply = appData.AppID
+	*reply = args.ID
 	return nil
 }
 func (s *RpcService) InsertAppUser(args *app.AppUser, reply *int) error {
@@ -60,17 +54,17 @@ func (s *RpcService) Update(args *app.App, reply *int) error {
 	return nil
 }
 
-func (s *RpcService) Delete(ID *int, reply *int) error {
-	if ID != nil {
-		err := s.Repo.Delete(s.ctx, &app.App{
-			ID: *ID,
-		})
-		if err != nil {
-			*reply = Fail
-			return err
-		}
-		*reply = Success
-	}
+func (s *RpcService) Delete(ID *string, reply *int) error {
+	// if ID != nil {
+	// 	err := s.Repo.Delete(s.ctx, &app.App{
+	// 		ID: *ID,
+	// 	})
+	// 	if err != nil {
+	// 		*reply = Fail
+	// 		return err
+	// 	}
+	// 	*reply = Success
+	// }
 	return nil
 }
 

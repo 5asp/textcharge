@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS public.apps
 (
     id regclass NOT NULL DEFAULT nextval('app_id_seq'::regclass),
-    appid integer,
+    appid regclass NOT NULL DEFAULT nextval('app_sequence'::regclass),
     secret text COLLATE pg_catalog."default",
     status integer,
     created_at timestamp with time zone,
@@ -44,3 +44,15 @@ CREATE SEQUENCE IF NOT EXISTS public.app_id_seq
 
 ALTER SEQUENCE public.app_id_seq
     OWNER TO manager;
+
+
+CREATE TABLE apps (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    app_id SERIAL UNIQUE,
+    secret text,
+    status integer,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
