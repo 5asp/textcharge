@@ -4,11 +4,7 @@ use (
 	./api-gateway
 	./application-management-service
 	./authentication-service
-	./dispatch-queue-service
-	./inspection-service
-	./messaging-queue-service
-	./service-management-service
 	./sms-service
 	./user-service
-	./validation-service
+	./t_platform
 )
